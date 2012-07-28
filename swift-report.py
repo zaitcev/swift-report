@@ -264,13 +264,7 @@ def main():
     for key in accset:
         a = accset[key]
 
-        keystr = ""
-        l = len(key)
-        n = 0
-        while n < lmax-l:
-            keystr += " "
-            n += 1
-        keystr += key
+        keystr = " "*(lmax-len(key)) + key
 
         bitstr = ""
         bitstr += ("S" if a.in_swift else "-")
