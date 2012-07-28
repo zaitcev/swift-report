@@ -256,9 +256,32 @@ def main():
         print "Poking Keystone"
     fetch_keystone_accounts(accset, par, r)
 
+    lmax = 0
+    for key in accset:
+        l = len(key)
+        if l > lmax: lmax = l
+
     for key in accset:
         a = accset[key]
-        print key, "swift", a.in_swift, "keystone", a.in_keystone, a.name
+
+        keystr = ""
+        l = len(key)
+        n = 0
+        while n < lmax-l:
+            keystr += " "
+            n += 1
+        keystr += key
+
+        bitstr = ""
+        bitstr += ("S" if a.in_swift else "-")
+        bitstr += ("K" if a.in_keystone else "-")
+
+        if a.name:  # same as a.in_keystone in this case
+            namestr = a.name
+        else:
+            namestr = "-"
+
+        print keystr, bitstr, namestr
 
 if __name__ == "__main__":
     main()
