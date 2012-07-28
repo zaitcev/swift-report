@@ -10,7 +10,7 @@ TAG="swift-report"
 # are routable and ~/.ssh/authorized_keys is set.
 
 # XXX This currently requires pre-positioning of swift-report-collect.py
-# on the storage nodes in /root/workarea/swift-report. No attempt is made
+# on the storage nodes in ${collect_path}. No attempt is made
 # to upload swift-report-collect.py through ssh. It is all pretty
 # badly hardcoded and incomplete.
 
@@ -57,6 +57,8 @@ def config(cfgname, inisect):
         cfg["user"] = cfgpr.get(inisect, "os_username")
         cfg["pass"] = cfgpr.get(inisect, "os_password")
         cfg["authurl"] = cfgpr.get(inisect, "os_auth_url")
+        #
+        cfg["collpath"] = cfgpr.get(inisect, "collect_path")
     except NoSectionError, e:
         raise ConfigError(cfgname+": "+str(e))
     except NoOptionError, e:
@@ -111,10 +113,11 @@ def get_stor_hosts(r):
 
 # Run ssh to every known device's host and collect accounts;
 # Update accset in-place.
-def fetch_swift_accounts(accset, stordevs):
+def fetch_swift_accounts(accset, par, stordevs):
 
     ssh_opts="-o ConnectTimeout=1 -o StrictHostKeyChecking=no"
-    ssh_cmd="python workarea/swift-report/swift-report-collect.py"
+    # XXX Silly to have just path and explicit python, make it 755 or something
+    ssh_cmd="python %s" % par.cfg["collpath"]
 
     for dev in stordevs:
         ssh_remote = "%s %s" % (ssh_cmd, dev[1])
@@ -248,7 +251,7 @@ def main():
     stordevs = get_stor_hosts(r)
     if par.verbose:
         print "Scanning hosts"
-    fetch_swift_accounts(accset, stordevs)
+    fetch_swift_accounts(accset, par, stordevs)
     if par.verbose:
         print "Poking Keystone"
     fetch_keystone_accounts(accset, par, r)
