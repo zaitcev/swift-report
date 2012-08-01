@@ -160,6 +160,7 @@ def find_storage_url(par, keystone):
     for svc in slist:
         if svc.type == 'object-store':
             swift_svc = svc
+            break
     if not swift_svc:
         raise LocalError("No 'object-store' service")
 
